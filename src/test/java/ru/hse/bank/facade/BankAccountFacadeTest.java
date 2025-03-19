@@ -13,80 +13,80 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BankAccountFacadeTest {
-    private BankAccountFacade bankAccountFacade;
-    private DomainFactory domainFactory;
+  private BankAccountFacade bankAccountFacade;
+  private DomainFactory domainFactory;
 
-    @BeforeEach
-    void setUp() {
-        domainFactory = new DomainFactory();
-        bankAccountFacade = new BankAccountFacade(domainFactory);
-    }
+  @BeforeEach
+  void setUp() {
+    domainFactory = new DomainFactory();
+    bankAccountFacade = new BankAccountFacade(domainFactory);
+  }
 
-    @Test
-    void createAccount_ValidData_ShouldCreateAccount() {
-        String name = "Test Account";
-        BigDecimal initialBalance = new BigDecimal("1000.00");
+  @Test
+  void createAccount_ValidData_ShouldCreateAccount() {
+    String name = "Test Account";
+    BigDecimal initialBalance = new BigDecimal("1000.00");
 
-        BankAccount account = bankAccountFacade.createAccount(name, initialBalance);
+    BankAccount account = bankAccountFacade.createAccount(name, initialBalance);
 
-        assertNotNull(account);
-        assertEquals(name, account.getName());
-        assertEquals(initialBalance, account.getBalance());
-    }
+    assertNotNull(account);
+    assertEquals(name, account.getName());
+    assertEquals(initialBalance, account.getBalance());
+  }
 
-    @Test
-    void createAccount_NegativeBalance_ShouldThrowException() {
-        String name = "Test Account";
-        BigDecimal negativeBalance = new BigDecimal("-1000.00");
+  @Test
+  void createAccount_NegativeBalance_ShouldThrowException() {
+    String name = "Test Account";
+    BigDecimal negativeBalance = new BigDecimal("-1000.00");
 
-        assertThrows(IllegalArgumentException.class, () -> 
-            bankAccountFacade.createAccount(name, negativeBalance));
-    }
+    assertThrows(IllegalArgumentException.class, () -> 
+      bankAccountFacade.createAccount(name, negativeBalance));
+  }
 
-    @Test
-    void updateBalance_IncomeOperation_ShouldIncreaseBalance() {
-        BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
-        Operation operation = domainFactory.createOperation(
-            CategoryType.INCOME,
-            account.getId(),
-            new BigDecimal("500.00"),
-            "Test income",
-            UUID.randomUUID()
-        );
+  @Test
+  void updateBalance_IncomeOperation_ShouldIncreaseBalance() {
+    BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
+    Operation operation = domainFactory.createOperation(
+      CategoryType.INCOME,
+      account.getId(),
+      new BigDecimal("500.00"),
+      "Test income",
+      UUID.randomUUID()
+    );
 
-        bankAccountFacade.updateBalance(account.getId(), operation);
+    bankAccountFacade.updateBalance(account.getId(), operation);
 
-        assertEquals(new BigDecimal("1500.00"), account.getBalance());
-    }
+    assertEquals(new BigDecimal("1500.00"), account.getBalance());
+  }
 
-    @Test
-    void updateBalance_ExpenseOperation_ShouldDecreaseBalance() {
-        BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
-        Operation operation = domainFactory.createOperation(
-            CategoryType.EXPENSE,
-            account.getId(),
-            new BigDecimal("300.00"),
-            "Test expense",
-            UUID.randomUUID()
-        );
+  @Test
+  void updateBalance_ExpenseOperation_ShouldDecreaseBalance() {
+    BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
+    Operation operation = domainFactory.createOperation(
+      CategoryType.EXPENSE,
+      account.getId(),
+      new BigDecimal("300.00"),
+      "Test expense",
+      UUID.randomUUID()
+    );
 
-        bankAccountFacade.updateBalance(account.getId(), operation);
+    bankAccountFacade.updateBalance(account.getId(), operation);
 
-        assertEquals(new BigDecimal("700.00"), account.getBalance());
-    }
+    assertEquals(new BigDecimal("700.00"), account.getBalance());
+  }
 
-    @Test
-    void updateBalance_InsufficientFunds_ShouldThrowException() {
-        BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
-        Operation operation = domainFactory.createOperation(
-            CategoryType.EXPENSE,
-            account.getId(),
-            new BigDecimal("1500.00"),
-            "Test expense",
-            UUID.randomUUID()
-        );
+  @Test
+  void updateBalance_InsufficientFunds_ShouldThrowException() {
+    BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
+    Operation operation = domainFactory.createOperation(
+      CategoryType.EXPENSE,
+      account.getId(),
+      new BigDecimal("1500.00"),
+      "Test expense",
+      UUID.randomUUID()
+    );
 
-        assertThrows(IllegalStateException.class, () -> 
-            bankAccountFacade.updateBalance(account.getId(), operation));
-    }
+    assertThrows(IllegalStateException.class, () -> 
+      bankAccountFacade.updateBalance(account.getId(), operation));
+  }
 } 
