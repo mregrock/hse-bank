@@ -68,8 +68,8 @@ public class JsonDataVisitor implements DataVisitor {
   public String getResult() {
     try {
       return objectMapper.writeValueAsString(new ExportData(accounts, categories, operations));
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to convert data to JSON", e);
+    } catch (Exception exception) {
+      throw new RuntimeException("Failed to convert data to JSON", exception);
     }
   }
 

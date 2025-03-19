@@ -8,8 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
 import ru.hse.bank.command.Command;
 import ru.hse.bank.command.TimedCommand;
 import ru.hse.bank.command.account.CreateAccountCommand;
@@ -76,26 +78,31 @@ public class ConsoleApplication implements CommandLineRunner {
   public void run(String... args) {
     while (true) {
       showMenu();
-      int choice = scanner.nextInt();
-      scanner.nextLine();
-
-      try {
-        switch (choice) {
-          case 1 -> createAccount();
-          case 2 -> createCategory();
-          case 3 -> createOperation();
-          case 4 -> showAnalytics();
-          case 5 -> exportData();
-          case 6 -> importData();
-          case 0 -> {
-            System.out.println("До свидания!");
-            return;
-          }
-          default -> System.out.println("Неверный выбор. Попробуйте снова.");
-        }
-      } catch (Exception e) {
-        System.out.println("Ошибка: " + e.getMessage());
-        scanner.nextLine();
+      String choice = scanner.nextLine();
+      switch (choice) {
+        case "1":
+          createAccount();
+          break;
+        case "2":
+          createCategory();
+          break;
+        case "3":
+          createOperation();
+          break;
+        case "4":
+          showAnalytics();
+          break;
+        case "5":
+          exportData();
+          break;
+        case "6":
+          importData();
+          break;
+        case "0":
+          System.out.println("До свидания!");
+          return;
+        default:
+          System.out.println("Неверный выбор. Попробуйте снова.");
       }
     }
   }
@@ -140,7 +147,7 @@ public class ConsoleApplication implements CommandLineRunner {
     System.out.println("Выберите тип категории:");
     System.out.println("1. Доход");
     System.out.println("2. Расход");
-    int typeChoice = scanner.nextInt();
+    final int typeChoice = scanner.nextInt();
     scanner.nextLine();
 
     CategoryType type = typeChoice == 1 ? CategoryType.INCOME : CategoryType.EXPENSE;
@@ -218,8 +225,8 @@ public class ConsoleApplication implements CommandLineRunner {
     try {
       dataExporter.exportData(Path.of(path), new JsonDataVisitor());
       System.out.println("Данные экспортированы");
-    } catch (IOException e) {
-      System.out.println("Ошибка при экспорте данных: " + e.getMessage());
+    } catch (IOException exception) {
+      System.out.println("Ошибка при экспорте данных: " + exception.getMessage());
     }
   }
 
@@ -232,8 +239,8 @@ public class ConsoleApplication implements CommandLineRunner {
     try {
       jsonDataImporter.importData(Path.of(path));
       System.out.println("Данные импортированы");
-    } catch (IOException e) {
-      System.out.println("Ошибка при импорте данных: " + e.getMessage());
+    } catch (IOException exception) {
+      System.out.println("Ошибка при импорте данных: " + exception.getMessage());
     }
   }
 }
