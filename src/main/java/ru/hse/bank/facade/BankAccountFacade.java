@@ -85,7 +85,7 @@ public class BankAccountFacade {
   public void updateBalance(UUID accountId, Operation operation) {
     BankAccount account = accounts.get(accountId);
     if (account == null) {
-      throw new IllegalArgumentException("Account not found");
+      throw new IllegalArgumentException("Счет не найден");
     }
 
     BigDecimal newBalance = account.getBalance();
@@ -96,7 +96,7 @@ public class BankAccountFacade {
     }
 
     if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalStateException("Insufficient funds");
+      throw new IllegalStateException("Недостаточно средств на счете");
     }
 
     account.setBalance(newBalance);

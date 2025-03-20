@@ -25,7 +25,7 @@ public class DomainFactory {
    */
   public BankAccount createBankAccount(String name, BigDecimal initialBalance) {
     if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
-      throw new IllegalArgumentException("Initial balance cannot be negative");
+      throw new IllegalArgumentException("Начальный баланс не может быть отрицательным");
     }
     return BankAccount.builder()
         .id(UUID.randomUUID())
@@ -62,7 +62,7 @@ public class DomainFactory {
   public Operation createOperation(CategoryType type, UUID bankAccountId, 
                    BigDecimal amount, String description, UUID categoryId) {
     if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new IllegalArgumentException("Amount must be positive");
+      throw new IllegalArgumentException("Сумма операции должна быть положительной");
     }
     return Operation.builder()
         .id(UUID.randomUUID())

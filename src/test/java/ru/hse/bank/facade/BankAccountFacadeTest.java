@@ -76,17 +76,32 @@ class BankAccountFacadeTest {
   }
 
   @Test
-  void updateBalance_InsufficientFunds_ShouldThrowException() {
-    BankAccount account = bankAccountFacade.createAccount("Test Account", new BigDecimal("1000.00"));
-    Operation operation = domainFactory.createOperation(
-      CategoryType.EXPENSE,
-      account.getId(),
-      new BigDecimal("1500.00"),
-      "Test expense",
-      UUID.randomUUID()
-    );
+  void updateBalance_AccountNotFound_ShouldThrowException() {
+    UUID nonExistentAccountId = UUID.randomUUID();
+    Operation operation = Operation.builder()
+        .id(UUID.randomUUID())
+        .type(CategoryType.INCOME)
+        .amount(BigDecimal.TEN)
+        .build();
 
-    assertThrows(IllegalStateException.class, () -> 
-      bankAccountFacade.updateBalance(account.getId(), operation));
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        bankAccountFacade.updateBalance(nonExistentAccountId, operation));
+    assertEquals("Счет не найден", exception.getMessage());
+  }
+
+  @Test
+  void updateBalance_InsufficientFunds_ShouldThrowException() {
+    BigDecimal initialBalance = BigDecimal.TEN;
+    BankAccount account = bankAccountFacade.createAccount("Test Account", initialBalance);
+    BigDecimal amount = new BigDecimal("20");
+    Operation operation = Operation.builder()
+        .id(UUID.randomUUID())
+        .type(CategoryType.EXPENSE)
+        .amount(amount)
+        .build();
+
+    IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
+        bankAccountFacade.updateBalance(account.getId(), operation));
+    assertEquals("Недостаточно средств на счете", exception.getMessage());
   }
 } 

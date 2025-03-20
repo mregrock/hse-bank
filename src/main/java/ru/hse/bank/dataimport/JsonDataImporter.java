@@ -1,6 +1,7 @@
 package ru.hse.bank.dataimport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,71 +18,42 @@ import ru.hse.bank.model.Operation;
  * It extends the DataImporter class and implements the abstract methods
  * for parsing the data from the JSON file.
  */
+@Component
 public class JsonDataImporter extends DataImporter {
   private final ObjectMapper objectMapper;
-
-  /**
-   * Constructor for JsonDataImporter.
-   *
-   * @param bankAccountFacade the bank account facade to use for creating bank accounts
-   * @param categoryFacade the category facade to use for creating categories
-   * @param operationFacade the operation facade to use for creating operations
-   */
-  public JsonDataImporter(BankAccountFacade bankAccountFacade,
-              CategoryFacade categoryFacade,
-              OperationFacade operationFacade) {
+  
+  public JsonDataImporter(ObjectMapper objectMapper, BankAccountFacade bankAccountFacade,
+                     CategoryFacade categoryFacade, OperationFacade operationFacade) {
     super(bankAccountFacade, categoryFacade, operationFacade);
-    this.objectMapper = new ObjectMapper();
+    this.objectMapper = objectMapper;
   }
 
-  /**
-   * Reads the content of a file.
-   *
-   * @param filePath the path to the file to read
-   * @return the content of the file
-   * @throws IOException if an I/O error occurs
-   */
   @Override
   protected String readFile(Path filePath) throws IOException {
     return Files.readString(filePath);
   }
 
-  /**
-   * Parses the accounts from the content.
-   *
-   * @param content the content of the file
-   * @return the list of accounts
-   * @throws IOException if an I/O error occurs
-   */
   @Override
   protected List<BankAccount> parseAccounts(String content) throws IOException {
-    return objectMapper.readValue(content, objectMapper.getTypeFactory()
-        .constructCollectionType(List.class, BankAccount.class));
+    ImportData data = objectMapper.readValue(content, ImportData.class);
+    return data.accounts;
   }
 
-  /**
-   * Parses the categories from the content.
-   *
-   * @param content the content of the file
-   * @return the list of categories
-   * @throws IOException if an I/O error occurs
-   */
   @Override
   protected List<Category> parseCategories(String content) throws IOException {
-    return objectMapper.readValue(content, objectMapper.getTypeFactory()
-        .constructCollectionType(List.class, Category.class));
+    ImportData data = objectMapper.readValue(content, ImportData.class);
+    return data.categories;
   }
 
-  /**
-   * Parses the operations from the content.
-   *
-   * @param content the content of the file
-   * @return the list of operations
-   * @throws IOException if an I/O error occurs
-   */
   @Override
   protected List<Operation> parseOperations(String content) throws IOException {
-    return objectMapper.readValue(content, objectMapper.getTypeFactory()
-        .constructCollectionType(List.class, Operation.class));
+    ImportData data = objectMapper.readValue(content, ImportData.class);
+    return data.operations;
+  }
+
+  private static class ImportData {
+    public List<BankAccount> accounts;
+    public List<Category> categories;
+    public List<Operation> operations;
   }
 } 
