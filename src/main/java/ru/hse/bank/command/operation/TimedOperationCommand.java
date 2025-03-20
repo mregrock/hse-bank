@@ -1,20 +1,35 @@
 package ru.hse.bank.command.operation;
 
-import ru.hse.bank.command.TimedCommand;
 import ru.hse.bank.model.Operation;
 
 /**
- * Represents a timed operation command.
- * This class extends the TimedCommand class and provides 
- * a constructor for initializing the command.
+ * Wrapper for an operation command that measures the execution time.
+ * This class implements the OperationCommand interface and provides a constructor for
+ * initializing the command with the actual operation command to execute.
  */
-public class TimedOperationCommand extends TimedCommand<Operation> {
+public class TimedOperationCommand implements OperationCommand {
+  private final OperationCommand command;
+
   /**
    * Constructor for TimedOperationCommand.
    *
-   * @param command the command to execute
+   * @param commandParam the operation command to execute and measure
    */
-  public TimedOperationCommand(OperationCommand command) {
-    super(command);
+  public TimedOperationCommand(final OperationCommand commandParam) {
+    this.command = commandParam;
+  }
+
+  /**
+   * Executes the command and measures the execution time.
+   *
+   * @return the result of the command execution
+   */
+  @Override
+  public Operation execute() {
+    long startTime = System.currentTimeMillis();
+    Operation result = command.execute();
+    long endTime = System.currentTimeMillis();
+    System.out.println("Выполнение команды заняло: " + (endTime - startTime) + " мс");
+    return result;
   }
 }

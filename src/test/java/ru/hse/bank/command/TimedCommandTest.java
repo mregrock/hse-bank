@@ -12,26 +12,26 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TimedCommandTest {
-    
+
     @Mock
     private Command<String> mockCommand;
-    
+
     private TimedCommand<String> timedCommand;
-    
+
     @BeforeEach
     void setUp() {
         timedCommand = new TimedCommand<>(mockCommand);
     }
-    
+
     @Test
     void execute_ShouldReturnResultFromWrappedCommand() {
         // Arrange
         String expectedResult = "Command Result";
         when(mockCommand.execute()).thenReturn(expectedResult);
-        
+
         // Act
         String result = timedCommand.execute();
-        
+
         // Assert
         assertEquals(expectedResult, result);
         verify(mockCommand).execute();

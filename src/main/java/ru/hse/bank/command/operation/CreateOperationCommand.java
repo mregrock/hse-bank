@@ -1,8 +1,8 @@
 package ru.hse.bank.command.operation;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
+
 import ru.hse.bank.factory.DomainFactory;
 import ru.hse.bank.model.CategoryType;
 import ru.hse.bank.model.Operation;
@@ -21,27 +21,27 @@ public class CreateOperationCommand implements OperationCommand {
   private final UUID categoryId;
 
   /**
-   * Constructor for CreateOperationCommand.
+   * Constructs a new CreateOperationCommand.
    *
-   * @param domainFactory the domain factory to use for creating the operation
-   * @param type the type of the operation
-   * @param bankAccountId the ID of the bank account
-   * @param amount the amount of the operation
-   * @param description the description of the operation
-   * @param categoryId the ID of the category
+   * @param domainFactoryParam the domain factory to use for creating the operation
+   * @param typeParam the type of the operation
+   * @param bankAccountIdParam the ID of the bank account
+   * @param amountParam the amount of the operation
+   * @param descriptionParam the description of the operation
+   * @param categoryIdParam the ID of the category
    */
-  public CreateOperationCommand(DomainFactory domainFactory,
-                CategoryType type,
-                UUID bankAccountId,
-                BigDecimal amount,
-                String description,
-                UUID categoryId) {
-    this.domainFactory = domainFactory;
-    this.type = type;
-    this.bankAccountId = bankAccountId;
-    this.amount = amount;
-    this.description = description;
-    this.categoryId = categoryId;
+  public CreateOperationCommand(final DomainFactory domainFactoryParam,
+                final CategoryType typeParam,
+                final UUID bankAccountIdParam,
+                final BigDecimal amountParam,
+                final String descriptionParam,
+                final UUID categoryIdParam) {
+    this.domainFactory = domainFactoryParam;
+    this.type = typeParam;
+    this.bankAccountId = bankAccountIdParam;
+    this.amount = amountParam;
+    this.description = descriptionParam;
+    this.categoryId = categoryIdParam;
   }
 
   /**

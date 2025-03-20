@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
-import ru.hse.bank.command.operation.CreateOperationCommand;
-import ru.hse.bank.command.operation.TimedOperationCommand;
+
 import ru.hse.bank.factory.DomainFactory;
 import ru.hse.bank.model.CategoryType;
 import ru.hse.bank.model.Operation;
@@ -29,12 +29,13 @@ public class OperationFacade {
   /**
    * Constructor for OperationFacade.
    *
-   * @param domainFactory the domain factory to use for creating operations
-   * @param bankAccountFacade the bank account facade to use for updating balances
+   * @param domainFactoryParam the domain factory to use for creating operations
+   * @param bankAccountFacadeParam the bank account facade to use for updating balances
    */
-  public OperationFacade(DomainFactory domainFactory, BankAccountFacade bankAccountFacade) {
-    this.domainFactory = domainFactory;
-    this.bankAccountFacade = bankAccountFacade;
+  public OperationFacade(final DomainFactory domainFactoryParam, 
+                         final BankAccountFacade bankAccountFacadeParam) {
+    this.domainFactory = domainFactoryParam;
+    this.bankAccountFacade = bankAccountFacadeParam;
   }
 
   /**
@@ -47,8 +48,8 @@ public class OperationFacade {
    * @param categoryId the ID of the category associated with the operation
    * @return the newly created operation
    */
-  public Operation createOperation(CategoryType type, UUID bankAccountId, 
-                   BigDecimal amount, String description, UUID categoryId) {
+  public Operation createOperation(final CategoryType type, final UUID bankAccountId, 
+                   final BigDecimal amount, final String description, final UUID categoryId) {
     Operation operation = domainFactory.createOperation(type, bankAccountId, amount, 
                                                         description, categoryId);
     bankAccountFacade.updateBalance(bankAccountId, operation);
@@ -62,7 +63,7 @@ public class OperationFacade {
    * @param id the ID of the operation to retrieve
    * @return the operation with the specified ID, or null if it does not exist
    */
-  public Operation getOperation(UUID id) {
+  public Operation getOperation(final UUID id) {
     return operations.get(id);
   }
 
@@ -81,7 +82,7 @@ public class OperationFacade {
    * @param bankAccountId the ID of the account
    * @return list of operations for the specified account
    */
-  public List<Operation> getOperationsByAccount(UUID bankAccountId) {
+  public List<Operation> getOperationsByAccount(final UUID bankAccountId) {
     return operations.values().stream()
         .filter(operation -> operation.getBankAccountId().equals(bankAccountId))
         .collect(Collectors.toList());
@@ -93,7 +94,7 @@ public class OperationFacade {
    * @param categoryId the ID of the category
    * @return list of operations for the specified category
    */
-  public List<Operation> getOperationsByCategory(UUID categoryId) {
+  public List<Operation> getOperationsByCategory(final UUID categoryId) {
     return operations.values().stream()
         .filter(operation -> operation.getCategoryId().equals(categoryId))
         .collect(Collectors.toList());
@@ -106,7 +107,7 @@ public class OperationFacade {
    * @param end the end date of the period
    * @return list of operations for the specified period
    */
-  public List<Operation> getOperationsByPeriod(LocalDateTime start, LocalDateTime end) {
+  public List<Operation> getOperationsByPeriod(final LocalDateTime start, final LocalDateTime end) {
     return operations.values().stream()
         .filter(operation -> operation.getDate().isAfter(start) 
                 && operation.getDate().isBefore(end))
@@ -118,7 +119,7 @@ public class OperationFacade {
    *
    * @param id the ID of the operation to delete
    */
-  public void deleteOperation(UUID id) {
+  public void deleteOperation(final UUID id) {
     Operation operation = operations.get(id);
     if (operation != null) {
       Operation reverseOperation = domainFactory.createOperation(

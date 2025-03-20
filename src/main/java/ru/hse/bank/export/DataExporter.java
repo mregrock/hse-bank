@@ -3,7 +3,9 @@ package ru.hse.bank.export;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.springframework.stereotype.Component;
+
 import ru.hse.bank.facade.BankAccountFacade;
 import ru.hse.bank.facade.CategoryFacade;
 import ru.hse.bank.facade.OperationFacade;
@@ -23,15 +25,16 @@ public class DataExporter {
    * Constructor for DataExporter.
    * Initializes the bank account facade, category facade, and operation facade.
    *
-   * @param bankAccountFacade the bank account facade
-   * @param categoryFacade the category facade
+   * @param bankAccountFacadeParam the bank account facade
+   * @param categoryFacadeParam the category facade
+   * @param operationFacadeParam the operation facade
    */
-  public DataExporter(BankAccountFacade bankAccountFacade,
-             CategoryFacade categoryFacade,
-             OperationFacade operationFacade) {
-    this.bankAccountFacade = bankAccountFacade;
-    this.categoryFacade = categoryFacade;
-    this.operationFacade = operationFacade;
+  public DataExporter(final BankAccountFacade bankAccountFacadeParam,
+             final CategoryFacade categoryFacadeParam,
+             final OperationFacade operationFacadeParam) {
+    this.bankAccountFacade = bankAccountFacadeParam;
+    this.categoryFacade = categoryFacadeParam;
+    this.operationFacade = operationFacadeParam;
   }
 
   /**
@@ -41,7 +44,7 @@ public class DataExporter {
    * @param visitor the data visitor
    * @throws IOException if an I/O error occurs
    */
-  public void exportData(Path filePath, DataVisitor visitor) throws IOException {
+  public void exportData(final Path filePath, final DataVisitor visitor) throws IOException {
     bankAccountFacade.getAllAccounts().forEach(visitor::visit);
     categoryFacade.getAllCategories().forEach(visitor::visit);
     operationFacade.getAllOperations().forEach(visitor::visit);

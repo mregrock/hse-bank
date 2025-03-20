@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.stereotype.Service;
+
 import ru.hse.bank.factory.DomainFactory;
 import ru.hse.bank.model.Category;
 import ru.hse.bank.model.CategoryType;
@@ -23,10 +25,10 @@ public class CategoryFacade {
   /**
    * Constructor for CategoryFacade.
    *
-   * @param domainFactory the domain factory to use for creating categories
+   * @param domainFactoryParam the domain factory to use for creating categories
    */
-  public CategoryFacade(DomainFactory domainFactory) {
-    this.domainFactory = domainFactory;
+  public CategoryFacade(final DomainFactory domainFactoryParam) {
+    this.domainFactory = domainFactoryParam;
   }
 
   /**
@@ -36,13 +38,13 @@ public class CategoryFacade {
    * @param type the type of the category (INCOME or EXPENSE)
    * @return the newly created category
    */
-  public Category createCategory(String name, CategoryType type) {
+  public Category createCategory(final String name, final CategoryType type) {
     Category category = domainFactory.createCategory(name, type);
     categories.put(category.getId(), category);
     return category;
   }
 
-  public Category getCategory(UUID id) {
+  public Category getCategory(final UUID id) {
     return categories.get(id);
   }
 
@@ -61,7 +63,7 @@ public class CategoryFacade {
    * @param type the type of the categories to retrieve
    * @return list of all categories of the specified type
    */
-  public List<Category> getCategoriesByType(CategoryType type) {
+  public List<Category> getCategoriesByType(final CategoryType type) {
     return categories.values().stream()
         .filter(category -> category.getType() == type)
         .toList();
@@ -72,7 +74,7 @@ public class CategoryFacade {
    *
    * @param id the ID of the category to delete
    */
-  public void deleteCategory(UUID id) {
+  public void deleteCategory(final UUID id) {
     categories.remove(id);
   }
 } 

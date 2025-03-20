@@ -17,17 +17,17 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 class JsonDataVisitorTest {
-    
+
     private JsonDataVisitor jsonDataVisitor;
     private ObjectMapper objectMapper;
-    
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         jsonDataVisitor = new JsonDataVisitor(objectMapper);
     }
-    
+
     @Test
     void visit_BankAccount_ShouldAddToAccounts() throws Exception {
         // Arrange
@@ -37,16 +37,16 @@ class JsonDataVisitorTest {
                 .name("Тестовый счет")
                 .balance(new BigDecimal("1000.00"))
                 .build();
-        
+
         // Act
         jsonDataVisitor.visit(account);
         String result = jsonDataVisitor.getResult();
-        
+
         // Assert
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("accounts"));
         assertEquals(1, jsonNode.get("accounts").size());
-        
+
         JsonNode accountNode = jsonNode.get("accounts").get(0);
         assertEquals(accountId.toString(), accountNode.get("id").asText());
         assertEquals("Тестовый счет", accountNode.get("name").asText());
@@ -54,7 +54,7 @@ class JsonDataVisitorTest {
         assertEquals(new BigDecimal("1000.00").stripTrailingZeros(), 
                      new BigDecimal(accountNode.get("balance").asText()).stripTrailingZeros());
     }
-    
+
     @Test
     void visit_Category_ShouldAddToCategories() throws Exception {
         // Arrange
@@ -64,22 +64,22 @@ class JsonDataVisitorTest {
                 .name("Зарплата")
                 .type(CategoryType.INCOME)
                 .build();
-        
+
         // Act
         jsonDataVisitor.visit(category);
         String result = jsonDataVisitor.getResult();
-        
+
         // Assert
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("categories"));
         assertEquals(1, jsonNode.get("categories").size());
-        
+
         JsonNode categoryNode = jsonNode.get("categories").get(0);
         assertEquals(categoryId.toString(), categoryNode.get("id").asText());
         assertEquals("Зарплата", categoryNode.get("name").asText());
         assertEquals("INCOME", categoryNode.get("type").asText());
     }
-    
+
     @Test
     void visit_Operation_ShouldAddToOperations() throws Exception {
         // Arrange
@@ -87,7 +87,7 @@ class JsonDataVisitorTest {
         UUID accountId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
         LocalDateTime now = LocalDateTime.now();
-        
+
         Operation operation = Operation.builder()
                 .id(operationId)
                 .type(CategoryType.EXPENSE)
@@ -97,16 +97,16 @@ class JsonDataVisitorTest {
                 .description("Покупка продуктов")
                 .date(now)
                 .build();
-        
+
         // Act
         jsonDataVisitor.visit(operation);
         String result = jsonDataVisitor.getResult();
-        
+
         // Assert
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("operations"));
         assertEquals(1, jsonNode.get("operations").size());
-        
+
         JsonNode operationNode = jsonNode.get("operations").get(0);
         assertEquals(operationId.toString(), operationNode.get("id").asText());
         assertEquals("EXPENSE", operationNode.get("type").asText());
@@ -117,7 +117,7 @@ class JsonDataVisitorTest {
         assertEquals("Покупка продуктов", operationNode.get("description").asText());
         assertNotNull(operationNode.get("date"));
     }
-    
+
     @Test
     void getResult_WithMultipleEntities_ShouldReturnValidJson() throws Exception {
         // Arrange
@@ -126,13 +126,13 @@ class JsonDataVisitorTest {
                 .name("Тестовый счет")
                 .balance(new BigDecimal("1000.00"))
                 .build();
-        
+
         Category category = Category.builder()
                 .id(UUID.randomUUID())
                 .name("Продукты")
                 .type(CategoryType.EXPENSE)
                 .build();
-        
+
         Operation operation = Operation.builder()
                 .id(UUID.randomUUID())
                 .type(CategoryType.EXPENSE)
@@ -142,20 +142,20 @@ class JsonDataVisitorTest {
                 .description("Покупка в супермаркете")
                 .date(LocalDateTime.now())
                 .build();
-        
+
         // Act
         jsonDataVisitor.visit(account);
         jsonDataVisitor.visit(category);
         jsonDataVisitor.visit(operation);
         String result = jsonDataVisitor.getResult();
-        
+
         // Assert
         JsonNode jsonNode = objectMapper.readTree(result);
-        
+
         assertTrue(jsonNode.has("accounts"));
         assertTrue(jsonNode.has("categories"));
         assertTrue(jsonNode.has("operations"));
-        
+
         assertEquals(1, jsonNode.get("accounts").size());
         assertEquals(1, jsonNode.get("categories").size());
         assertEquals(1, jsonNode.get("operations").size());

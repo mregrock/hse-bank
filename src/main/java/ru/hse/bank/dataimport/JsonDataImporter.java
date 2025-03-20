@@ -1,11 +1,13 @@
 package ru.hse.bank.dataimport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
+
 import ru.hse.bank.facade.BankAccountFacade;
 import ru.hse.bank.facade.CategoryFacade;
 import ru.hse.bank.facade.OperationFacade;
@@ -21,32 +23,42 @@ import ru.hse.bank.model.Operation;
 @Component
 public class JsonDataImporter extends DataImporter {
   private final ObjectMapper objectMapper;
-  
-  public JsonDataImporter(ObjectMapper objectMapper, BankAccountFacade bankAccountFacade,
-                     CategoryFacade categoryFacade, OperationFacade operationFacade) {
-    super(bankAccountFacade, categoryFacade, operationFacade);
-    this.objectMapper = objectMapper;
+
+  /**
+   * Constructor for JsonDataImporter.
+   *
+   * @param objectMapperParam the Jackson object mapper
+   * @param bankAccountFacadeParam the bank account facade to use for creating bank accounts
+   * @param categoryFacadeParam the category facade to use for creating categories
+   * @param operationFacadeParam the operation facade to use for creating operations
+   */
+  public JsonDataImporter(final ObjectMapper objectMapperParam, 
+                       final BankAccountFacade bankAccountFacadeParam,
+                       final CategoryFacade categoryFacadeParam, 
+                       final OperationFacade operationFacadeParam) {
+    super(bankAccountFacadeParam, categoryFacadeParam, operationFacadeParam);
+    this.objectMapper = objectMapperParam;
   }
 
   @Override
-  protected String readFile(Path filePath) throws IOException {
+  protected String readFile(final Path filePath) throws IOException {
     return Files.readString(filePath);
   }
 
   @Override
-  protected List<BankAccount> parseAccounts(String content) throws IOException {
+  protected List<BankAccount> parseAccounts(final String content) throws IOException {
     ImportData data = objectMapper.readValue(content, ImportData.class);
     return data.accounts;
   }
 
   @Override
-  protected List<Category> parseCategories(String content) throws IOException {
+  protected List<Category> parseCategories(final String content) throws IOException {
     ImportData data = objectMapper.readValue(content, ImportData.class);
     return data.categories;
   }
 
   @Override
-  protected List<Operation> parseOperations(String content) throws IOException {
+  protected List<Operation> parseOperations(final String content) throws IOException {
     ImportData data = objectMapper.readValue(content, ImportData.class);
     return data.operations;
   }

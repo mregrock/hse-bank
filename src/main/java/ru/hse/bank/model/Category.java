@@ -10,64 +10,71 @@ public class Category {
   private UUID id;
   private String name;
   private CategoryType type;
-  
+
   public Category() {
   }
-  
-  public Category(UUID id, String name, CategoryType type) {
-    this.id = id;
-    this.name = name;
-    this.type = type;
+
+  /**
+   * Constructor for Category.
+   *
+   * @param idParam the ID of the category
+   * @param nameParam the name of the category
+   * @param typeParam the type of the category
+   */
+  public Category(final UUID idParam, final String nameParam, final CategoryType typeParam) {
+    this.id = idParam;
+    this.name = nameParam;
+    this.type = typeParam;
   }
-  
+
   public UUID getId() {
     return id;
   }
-  
-  public void setId(UUID id) {
-    this.id = id;
+
+  public void setId(final UUID idParam) {
+    this.id = idParam;
   }
-  
+
   public String getName() {
     return name;
   }
-  
-  public void setName(String name) {
-    this.name = name;
+
+  public void setName(final String nameParam) {
+    this.name = nameParam;
   }
-  
+
   public CategoryType getType() {
     return type;
   }
-  
-  public void setType(CategoryType type) {
-    this.type = type;
+
+  public void setType(final CategoryType typeParam) {
+    this.type = typeParam;
   }
-  
+
   public static CategoryBuilder builder() {
     return new CategoryBuilder();
   }
-  
+
   public static class CategoryBuilder {
     private UUID id;
     private String name;
     private CategoryType type;
-    
-    public CategoryBuilder id(UUID id) {
-      this.id = id;
+
+    public CategoryBuilder id(final UUID idParam) {
+      this.id = idParam;
       return this;
     }
-    
-    public CategoryBuilder name(String name) {
-      this.name = name;
+
+    public CategoryBuilder name(final String nameParam) {
+      this.name = nameParam;
       return this;
     }
-    
-    public CategoryBuilder type(CategoryType type) {
-      this.type = type;
+
+    public CategoryBuilder type(final CategoryType typeParam) {
+      this.type = typeParam;
       return this;
     }
-    
+
     public Category build() {
       return new Category(id, name, type);
     }

@@ -1,7 +1,7 @@
 package ru.hse.bank.command.account;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 import ru.hse.bank.factory.DomainFactory;
 import ru.hse.bank.model.BankAccount;
 
@@ -18,14 +18,16 @@ public class CreateAccountCommand implements AccountCommand {
   /**
    * Constructor for CreateAccountCommand.
    *
-   * @param domainFactory the domain factory
-   * @param name the name of the bank account
-   * @param balance the balance of the bank account
+   * @param domainFactoryParam the domain factory
+   * @param nameParam the name of the bank account
+   * @param balanceParam the balance of the bank account
    */
-  public CreateAccountCommand(DomainFactory domainFactory, String name, BigDecimal balance) {
-    this.domainFactory = domainFactory;
-    this.name = name;
-    this.balance = balance;
+  public CreateAccountCommand(final DomainFactory domainFactoryParam, 
+                             final String nameParam, 
+                             final BigDecimal balanceParam) {
+    this.domainFactory = domainFactoryParam;
+    this.name = nameParam;
+    this.balance = balanceParam;
   }
 
   /**

@@ -20,20 +20,20 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OperationFacadeTest {
-    
+
     @Mock
     private DomainFactory domainFactory;
-    
+
     @Mock
     private BankAccountFacade bankAccountFacade;
-    
+
     private OperationFacade operationFacade;
-    
+
     @BeforeEach
     void setUp() {
         operationFacade = new OperationFacade(domainFactory, bankAccountFacade);
     }
-    
+
     @Test
     void createOperation_ShouldCreateOperationAndUpdateBalance() {
         // Arrange
@@ -42,7 +42,7 @@ class OperationFacadeTest {
         CategoryType type = CategoryType.INCOME;
         BigDecimal amount = new BigDecimal("100.00");
         String description = "Тестовая операция";
-        
+
         Operation mockOperation = Operation.builder()
                 .id(UUID.randomUUID())
                 .type(type)
@@ -52,20 +52,20 @@ class OperationFacadeTest {
                 .description(description)
                 .date(LocalDateTime.now())
                 .build();
-        
+
         when(domainFactory.createOperation(type, bankAccountId, amount, description, categoryId))
                 .thenReturn(mockOperation);
-        
+
         // Act
         Operation result = operationFacade.createOperation(type, bankAccountId, amount, description, categoryId);
-        
+
         // Assert
         assertEquals(mockOperation, result);
         verify(domainFactory).createOperation(type, bankAccountId, amount, description, categoryId);
         verify(bankAccountFacade).updateBalance(bankAccountId, mockOperation);
         assertEquals(mockOperation, operationFacade.getOperation(mockOperation.getId()));
     }
-    
+
     @Test
     void getAllOperations_ShouldReturnAllOperations() {
         // Arrange
@@ -73,92 +73,92 @@ class OperationFacadeTest {
                 new BigDecimal("100.00"), "Зарплата", UUID.randomUUID());
         Operation operation2 = createAndAddOperation(CategoryType.EXPENSE, UUID.randomUUID(), 
                 new BigDecimal("50.00"), "Кафе", UUID.randomUUID());
-        
+
         // Act
         List<Operation> allOperations = operationFacade.getAllOperations();
-        
+
         // Assert
         assertEquals(2, allOperations.size());
         assertTrue(allOperations.contains(operation1));
         assertTrue(allOperations.contains(operation2));
     }
-    
+
     @Test
     void getOperationsByAccount_ShouldReturnOperationsForSpecificAccount() {
         // Arrange
         UUID accountId1 = UUID.randomUUID();
         UUID accountId2 = UUID.randomUUID();
-        
+
         Operation operation1 = createAndAddOperation(CategoryType.INCOME, accountId1, 
                 new BigDecimal("100.00"), "Операция 1", UUID.randomUUID());
         Operation operation2 = createAndAddOperation(CategoryType.EXPENSE, accountId1, 
                 new BigDecimal("50.00"), "Операция 2", UUID.randomUUID());
         Operation operation3 = createAndAddOperation(CategoryType.EXPENSE, accountId2, 
                 new BigDecimal("30.00"), "Операция 3", UUID.randomUUID());
-        
+
         // Act
         List<Operation> account1Operations = operationFacade.getOperationsByAccount(accountId1);
         List<Operation> account2Operations = operationFacade.getOperationsByAccount(accountId2);
-        
+
         // Assert
         assertEquals(2, account1Operations.size());
         assertTrue(account1Operations.contains(operation1));
         assertTrue(account1Operations.contains(operation2));
-        
+
         assertEquals(1, account2Operations.size());
         assertTrue(account2Operations.contains(operation3));
     }
-    
+
     @Test
     void getOperationsByCategory_ShouldReturnOperationsForSpecificCategory() {
         // Arrange
         UUID categoryId1 = UUID.randomUUID();
         UUID categoryId2 = UUID.randomUUID();
-        
+
         Operation operation1 = createAndAddOperation(CategoryType.INCOME, UUID.randomUUID(), 
                 new BigDecimal("100.00"), "Операция 1", categoryId1);
         Operation operation2 = createAndAddOperation(CategoryType.EXPENSE, UUID.randomUUID(), 
                 new BigDecimal("50.00"), "Операция 2", categoryId2);
         Operation operation3 = createAndAddOperation(CategoryType.EXPENSE, UUID.randomUUID(), 
                 new BigDecimal("30.00"), "Операция 3", categoryId1);
-        
+
         // Act
         List<Operation> category1Operations = operationFacade.getOperationsByCategory(categoryId1);
         List<Operation> category2Operations = operationFacade.getOperationsByCategory(categoryId2);
-        
+
         // Assert
         assertEquals(2, category1Operations.size());
         assertTrue(category1Operations.contains(operation1));
         assertTrue(category1Operations.contains(operation3));
-        
+
         assertEquals(1, category2Operations.size());
         assertTrue(category2Operations.contains(operation2));
     }
-    
+
     @Test
     void getOperationsByPeriod_ShouldReturnOperationsInSpecificPeriod() {
         // Arrange
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusDays(1);
         LocalDateTime tomorrow = now.plusDays(1);
-        
+
         Operation pastOperation = createAndAddOperationWithDate(CategoryType.INCOME, UUID.randomUUID(), 
                 new BigDecimal("100.00"), "Прошлая операция", UUID.randomUUID(), yesterday);
         Operation futureOperation = createAndAddOperationWithDate(CategoryType.EXPENSE, UUID.randomUUID(), 
                 new BigDecimal("50.00"), "Будущая операция", UUID.randomUUID(), tomorrow);
-        
+
         // Act
         List<Operation> periodOperations = operationFacade.getOperationsByPeriod(yesterday.plusHours(1), tomorrow.minusHours(1));
-        
+
         // Assert
         assertTrue(periodOperations.isEmpty());
-        
+
         List<Operation> allOperations = operationFacade.getOperationsByPeriod(yesterday.minusDays(1), tomorrow.plusDays(1));
         assertEquals(2, allOperations.size());
         assertTrue(allOperations.contains(pastOperation));
         assertTrue(allOperations.contains(futureOperation));
     }
-    
+
     @Test
     void deleteOperation_ShouldRemoveOperationAndCreateReverseOperation() {
         // Arrange
@@ -166,9 +166,9 @@ class OperationFacadeTest {
         UUID categoryId = UUID.randomUUID();
         Operation operation = createAndAddOperation(CategoryType.INCOME, bankAccountId, 
                 new BigDecimal("100.00"), "Операция на удаление", categoryId);
-        
+
         UUID operationId = operation.getId();
-        
+
         Operation reverseOperation = Operation.builder()
                 .id(UUID.randomUUID())
                 .type(CategoryType.EXPENSE)
@@ -178,7 +178,7 @@ class OperationFacadeTest {
                 .description("Отмена операции: Операция на удаление")
                 .date(LocalDateTime.now())
                 .build();
-        
+
         when(domainFactory.createOperation(
                 CategoryType.EXPENSE, 
                 bankAccountId, 
@@ -186,15 +186,15 @@ class OperationFacadeTest {
                 "Отмена операции: Операция на удаление", 
                 categoryId))
                 .thenReturn(reverseOperation);
-        
+
         // Act
         operationFacade.deleteOperation(operationId);
-        
+
         // Assert
         assertNull(operationFacade.getOperation(operationId));
         verify(bankAccountFacade).updateBalance(bankAccountId, reverseOperation);
     }
-    
+
     private Operation createAndAddOperation(CategoryType type, UUID bankAccountId, 
                                            BigDecimal amount, String description, UUID categoryId) {
         Operation operation = Operation.builder()
@@ -206,13 +206,13 @@ class OperationFacadeTest {
                 .description(description)
                 .date(LocalDateTime.now())
                 .build();
-        
+
         when(domainFactory.createOperation(type, bankAccountId, amount, description, categoryId))
                 .thenReturn(operation);
-        
+
         return operationFacade.createOperation(type, bankAccountId, amount, description, categoryId);
     }
-    
+
     private Operation createAndAddOperationWithDate(CategoryType type, UUID bankAccountId, 
                                                   BigDecimal amount, String description, 
                                                   UUID categoryId, LocalDateTime date) {
@@ -225,10 +225,10 @@ class OperationFacadeTest {
                 .description(description)
                 .date(date)
                 .build();
-        
+
         when(domainFactory.createOperation(type, bankAccountId, amount, description, categoryId))
                 .thenReturn(operation);
-        
+
         return operationFacade.createOperation(type, bankAccountId, amount, description, categoryId);
     }
 } 

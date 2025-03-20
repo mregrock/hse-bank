@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,6 @@ import ru.hse.bank.model.BankAccount;
 import ru.hse.bank.model.Category;
 import ru.hse.bank.model.CategoryType;
 import ru.hse.bank.model.Operation;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Represents a console application that allows users to interact with the HseBank system.
@@ -37,39 +37,77 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Component
 public class ConsoleApplication implements CommandLineRunner {
+
+  /**
+   * A class that combines all application components.
+   * Used to reduce the number of parameters in the constructor.
+   */
+  public static class ApplicationComponents {
+    private final BankAccountFacade bankAccountFacade;
+    private final CategoryFacade categoryFacade;
+    private final OperationFacade operationFacade;
+    private final AnalyticsFacade analyticsFacade;
+    private final DataExporter dataExporter;
+    private final JsonDataImporter jsonDataImporter;
+    private final DomainFactory domainFactory;
+    private final ObjectMapper objectMapper;
+
+    /**
+     * Constructor for the inner class ApplicationComponents.
+     *
+     * @param bankAccountFacadeParam the bank account facade
+     * @param categoryFacadeParam the category facade
+     * @param operationFacadeParam the operation facade
+     * @param analyticsFacadeParam the analytics facade
+     * @param dataExporterParam the data exporter
+     * @param jsonDataImporterParam the JSON data importer
+     * @param domainFactoryParam the domain factory
+     * @param objectMapperParam the Jackson object mapper
+     */
+    public ApplicationComponents(final BankAccountFacade bankAccountFacadeParam, 
+                                final CategoryFacade categoryFacadeParam,
+                                final OperationFacade operationFacadeParam,
+                                final AnalyticsFacade analyticsFacadeParam,
+                                final DataExporter dataExporterParam,
+                                final JsonDataImporter jsonDataImporterParam,
+                                final DomainFactory domainFactoryParam,
+                                final ObjectMapper objectMapperParam) {
+      this.bankAccountFacade = bankAccountFacadeParam;
+      this.categoryFacade = categoryFacadeParam;
+      this.operationFacade = operationFacadeParam;
+      this.analyticsFacade = analyticsFacadeParam;
+      this.dataExporter = dataExporterParam;
+      this.jsonDataImporter = jsonDataImporterParam;
+      this.domainFactory = domainFactoryParam;
+      this.objectMapper = objectMapperParam;
+    }
+  }
+
   private final BankAccountFacade bankAccountFacade;
   private final CategoryFacade categoryFacade;
   private final OperationFacade operationFacade;
   private final AnalyticsFacade analyticsFacade;
   private final DataExporter dataExporter;
   private final JsonDataImporter jsonDataImporter;
-  private final Scanner scanner;
   private final DomainFactory domainFactory;
   private final ObjectMapper objectMapper;
+  private final Scanner scanner;
 
   /**
    * Constructor for ConsoleApplication.
    * Initializes the application with the necessary facades and components.
    *
-   * @param bankAccountFacade the bank account facade
-   * @param categoryFacade the category facade
+   * @param components the application components
    */
-  public ConsoleApplication(BankAccountFacade bankAccountFacade,
-              CategoryFacade categoryFacade,
-              OperationFacade operationFacade,
-              AnalyticsFacade analyticsFacade,
-              DataExporter dataExporter,
-              JsonDataImporter jsonDataImporter,
-              DomainFactory domainFactory,
-              ObjectMapper objectMapper) {
-    this.bankAccountFacade = bankAccountFacade;
-    this.categoryFacade = categoryFacade;
-    this.operationFacade = operationFacade;
-    this.analyticsFacade = analyticsFacade;
-    this.dataExporter = dataExporter;
-    this.jsonDataImporter = jsonDataImporter;
-    this.domainFactory = domainFactory;
-    this.objectMapper = objectMapper;
+  public ConsoleApplication(final ApplicationComponents components) {
+    this.bankAccountFacade = components.bankAccountFacade;
+    this.categoryFacade = components.categoryFacade;
+    this.operationFacade = components.operationFacade;
+    this.analyticsFacade = components.analyticsFacade;
+    this.dataExporter = components.dataExporter;
+    this.jsonDataImporter = components.jsonDataImporter;
+    this.domainFactory = components.domainFactory;
+    this.objectMapper = components.objectMapper;
     this.scanner = new Scanner(System.in);
   }
 
@@ -79,7 +117,7 @@ public class ConsoleApplication implements CommandLineRunner {
    * @param args command line arguments
    */
   @Override
-  public void run(String... args) {
+  public void run(final String... args) {
     while (true) {
       showMenu();
       String choice = scanner.nextLine();
@@ -131,18 +169,17 @@ public class ConsoleApplication implements CommandLineRunner {
    */
   private void createAccount() {
     System.out.print("Введите название счета: ");
-    String name = scanner.nextLine();
+    final String name = scanner.nextLine();
     System.out.print("Введите начальный баланс: ");
-    BigDecimal balance = scanner.nextBigDecimal();
+    final BigDecimal balance = scanner.nextBigDecimal();
     scanner.nextLine();
 
-    Command<BankAccount> command = new CreateAccountCommand(domainFactory, name, balance);
-    Command<BankAccount> timedCommand = new TimedCommand<>(command);
-    BankAccount account = timedCommand.execute();
-    
-    // Сохраняем созданный счет в фасаде
+    final Command<BankAccount> command = new CreateAccountCommand(domainFactory, name, balance);
+    final Command<BankAccount> timedCommand = new TimedCommand<>(command);
+    final BankAccount account = timedCommand.execute();
+
     bankAccountFacade.createAccount(name, balance);
-    
+
     System.out.println("Счет создан: " + account.getId());
   }
 
@@ -151,17 +188,16 @@ public class ConsoleApplication implements CommandLineRunner {
    */
   private void createCategory() {
     System.out.print("Введите название категории: ");
-    String name = scanner.nextLine();
+    final String name = scanner.nextLine();
     System.out.println("Выберите тип категории:");
     System.out.println("1. Доход");
     System.out.println("2. Расход");
-    int typeChoice = scanner.nextInt();
+    final int typeChoice = scanner.nextInt();
     scanner.nextLine();
 
-    CategoryType type = typeChoice == 1 ? CategoryType.INCOME : CategoryType.EXPENSE;
-    
-    // Создаем и сохраняем категорию в фасаде
-    Category category = categoryFacade.createCategory(name, type);
+    final CategoryType type = typeChoice == 1 ? CategoryType.INCOME : CategoryType.EXPENSE;
+
+    final Category category = categoryFacade.createCategory(name, type);
     System.out.println("Категория создана: " + category.getId());
   }
 
@@ -170,63 +206,65 @@ public class ConsoleApplication implements CommandLineRunner {
    */
   private void createOperation() {
     try {
-      // Показать список счетов пользователю для выбора
       System.out.println("Доступные счета:");
       bankAccountFacade.getAllAccounts().forEach(account -> 
           System.out.println(account.getId() + " - " + account.getName()));
-      
+
       System.out.print("Введите ID счета: ");
       final String accountIdStr = scanner.nextLine();
       final UUID accountId;
       try {
         accountId = UUID.fromString(accountIdStr);
-      } catch (IllegalArgumentException e) {
-        System.out.println("Ошибка: Некорректный формат UUID для счета. Пример правильного формата: f9e3f56d-09f1-4109-8443-36d0dc7a06ce");
+      } catch (IllegalArgumentException exception) {
+        System.out.println("Ошибка: Некорректный формат UUID для счета. " 
+            + "Пример правильного формата: f9e3f56d-09f1-4109-8443-36d0dc7a06ce");
         return;
       }
-      
-      // Показать список категорий пользователю для выбора
+
       System.out.println("Доступные категории:");
       categoryFacade.getAllCategories().forEach(category -> 
-          System.out.println(category.getId() + " - " + category.getName() + " (" + category.getType() + ")"));
-      
+          System.out.println(category.getId() + " - " 
+              + category.getName() + " (" + category.getType() + ")"));
+
       System.out.print("Введите ID категории: ");
       final String categoryIdStr = scanner.nextLine();
       final UUID categoryId;
       try {
         categoryId = UUID.fromString(categoryIdStr);
-      } catch (IllegalArgumentException e) {
-        System.out.println("Ошибка: Некорректный формат UUID для категории. Пример правильного формата: f9e3f56d-09f1-4109-8443-36d0dc7a06ce");
+      } catch (IllegalArgumentException exception) {
+        System.out.println("Ошибка: Некорректный формат UUID для категории. "
+            + "Пример правильного формата: f9e3f56d-09f1-4109-8443-36d0dc7a06ce");
         return;
       }
+
       
-      // Получаем категорию по ID для определения типа операции
-      Category category = categoryFacade.getCategory(categoryId);
+      final Category category = categoryFacade.getCategory(categoryId);
       if (category == null) {
         System.out.println("Ошибка: Категория с указанным ID не найдена.");
         return;
       }
-      
+
       System.out.print("Введите сумму: ");
       final BigDecimal amount;
       try {
         amount = scanner.nextBigDecimal();
-        scanner.nextLine(); // очистка буфера после ввода числа
-      } catch (Exception e) {
-        System.out.println("Ошибка: Неверный формат числа для суммы. Используйте десятичный формат (например, 100.50)");
-        scanner.nextLine(); // очистка буфера при ошибке
+        scanner.nextLine(); 
+      } catch (Exception exception) {
+        System.out.println("Ошибка: Неверный формат числа для суммы. "
+            + "Используйте десятичный формат (например, 100.50)");
+        scanner.nextLine(); 
         return;
       }
-      
+
       System.out.print("Введите описание: ");
       final String description = scanner.nextLine();
+
       
-      // Используем тип категории как тип операции
-      CategoryType type = category.getType();
+      final CategoryType type = category.getType();
       System.out.println("Тип операции (на основе выбранной категории): " + type);
-      
+
       try {
-        Command<Operation> command = new CreateOperationCommand(
+        final Command<Operation> command = new CreateOperationCommand(
             domainFactory,
             type,
             accountId,
@@ -234,15 +272,15 @@ public class ConsoleApplication implements CommandLineRunner {
             description,
             categoryId
         );
-        Command<Operation> timedCommand = new TimedCommand<>(command);
-        Operation operation = timedCommand.execute();
+        final Command<Operation> timedCommand = new TimedCommand<>(command);
+        final Operation operation = timedCommand.execute();
         System.out.println("Операция создана: " + operation.getId());
-      } catch (Exception e) {
-        System.out.println("Ошибка при создании операции: " + e.getMessage());
+      } catch (Exception exception) {
+        System.out.println("Ошибка при создании операции: " + exception.getMessage());
       }
-    } catch (Exception e) {
-      System.out.println("Произошла неожиданная ошибка: " + e.getMessage());
-      scanner.nextLine(); // На всякий случай очищаем буфер
+    } catch (Exception exception) {
+      System.out.println("Произошла неожиданная ошибка: " + exception.getMessage());
+      scanner.nextLine(); 
     }
   }
 
@@ -252,13 +290,13 @@ public class ConsoleApplication implements CommandLineRunner {
   private void showAnalytics() {
     System.out.println("Введите период анализа (в формате dd.MM.yyyy HH:mm:ss):");
     System.out.print("Начало: ");
-    String startStr = scanner.nextLine();
+    final String startStr = scanner.nextLine();
     System.out.print("Конец: ");
-    String endStr = scanner.nextLine();
+    final String endStr = scanner.nextLine();
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
-    LocalDateTime start = LocalDateTime.parse(startStr, formatter);
-    LocalDateTime end = LocalDateTime.parse(endStr, formatter);
+    final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+    final LocalDateTime start = LocalDateTime.parse(startStr, formatter);
+    final LocalDateTime end = LocalDateTime.parse(endStr, formatter);
 
     final BigDecimal balanceDiff = analyticsFacade.calculateBalanceDifference(start, end);
     final Map<UUID, BigDecimal> byCategory = analyticsFacade.groupOperationsByCategory(start, end);
@@ -279,22 +317,25 @@ public class ConsoleApplication implements CommandLineRunner {
    */
   private void exportData() {
     System.out.print("Введите путь для экспорта: ");
-    String path = scanner.nextLine();
+    final String inputPath = scanner.nextLine();
+
     
-    // Обработка пути с тильдой (~) - замена на домашний каталог пользователя
-    if (path.startsWith("~")) {
-      String homePath = System.getProperty("user.home");
-      path = homePath + path.substring(1);
+    final String path;
+    if (inputPath.startsWith("~")) {
+      final String homePath = System.getProperty("user.home");
+      path = homePath + inputPath.substring(1);
+    } else {
+      path = inputPath;
     }
-    
+
     try {
-      Path filePath = Path.of(path);
-      // Создаем директории, если они не существуют
-      Path parent = filePath.getParent();
+      final Path filePath = Path.of(path);
+      
+      final Path parent = filePath.getParent();
       if (parent != null) {
         java.nio.file.Files.createDirectories(parent);
       }
-      
+
       dataExporter.exportData(filePath, new JsonDataVisitor(objectMapper));
       System.out.println("Данные экспортированы в: " + filePath.toAbsolutePath());
     } catch (IOException exception) {
@@ -307,16 +348,19 @@ public class ConsoleApplication implements CommandLineRunner {
    */
   private void importData() {
     System.out.print("Введите путь к файлу для импорта: ");
-    String path = scanner.nextLine();
+    final String inputPath = scanner.nextLine();
+
     
-    // Обработка пути с тильдой (~) - замена на домашний каталог пользователя
-    if (path.startsWith("~")) {
-      String homePath = System.getProperty("user.home");
-      path = homePath + path.substring(1);
+    final String path;
+    if (inputPath.startsWith("~")) {
+      final String homePath = System.getProperty("user.home");
+      path = homePath + inputPath.substring(1);
+    } else {
+      path = inputPath;
     }
-    
+
     try {
-      Path filePath = Path.of(path);
+      final Path filePath = Path.of(path);
       jsonDataImporter.importData(filePath);
       System.out.println("Данные импортированы из: " + filePath.toAbsolutePath());
     } catch (IOException exception) {

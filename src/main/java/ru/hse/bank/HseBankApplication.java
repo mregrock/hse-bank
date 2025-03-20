@@ -4,12 +4,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Main application class for the HseBank application.
- * This class is the entry point for the Spring Boot application.
+ * Main application class for HseBank.
+ * This class contains the main method and launches the application.
  */
 @SpringBootApplication
 public class HseBankApplication {
-  public static void main(String[] args) {
+  /**
+   * Main method for starting the application.
+   *
+   * @param args command line arguments
+   */
+  public static void main(final String[] args) {
     SpringApplication.run(HseBankApplication.class, args);
   }
 } 

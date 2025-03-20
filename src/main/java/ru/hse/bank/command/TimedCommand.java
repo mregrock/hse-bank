@@ -1,27 +1,33 @@
 package ru.hse.bank.command;
 
-import java.time.Duration;
-import java.time.Instant;
-
 /**
- * Represents a timed command that can be executed and returns a result of type T.
- *
- * @param <T> the type of the result
+ * Wrapper for a command that measures the execution time.
+ * This class implements the Command interface and provides a constructor for
+ * initializing the command with the actual command to execute.
  */
 public class TimedCommand<T> implements Command<T> {
   private final Command<T> command;
 
-  public TimedCommand(Command<T> command) {
-    this.command = command;
+  /**
+   * Constructor for TimedCommand.
+   *
+   * @param commandParam the command to execute and measure
+   */
+  public TimedCommand(final Command<T> commandParam) {
+    this.command = commandParam;
   }
 
+  /**
+   * Executes the command and measures the execution time.
+   *
+   * @return the result of the command execution
+   */
   @Override
   public T execute() {
-    Instant start = Instant.now();
+    long startTime = System.currentTimeMillis();
     T result = command.execute();
-    Instant end = Instant.now();
-    Duration duration = Duration.between(start, end);
-    System.out.println("Выполнение команды заняло: " + duration.toMillis() + " мс");
+    long endTime = System.currentTimeMillis();
+    System.out.println("Выполнение команды заняло: " + (endTime - startTime) + " мс");
     return result;
   }
 } 

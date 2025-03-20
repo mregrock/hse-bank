@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.stereotype.Service;
-import ru.hse.bank.command.account.CreateAccountCommand;
-import ru.hse.bank.command.account.TimedAccountCommand;
+
 import ru.hse.bank.factory.DomainFactory;
 import ru.hse.bank.model.BankAccount;
 import ru.hse.bank.model.CategoryType;
@@ -27,10 +27,10 @@ public class BankAccountFacade {
   /**
    * Constructor for BankAccountFacade.
    *
-   * @param domainFactory the domain factory to use for creating bank accounts
+   * @param domainFactoryParam the domain factory to use for creating bank accounts
    */
-  public BankAccountFacade(DomainFactory domainFactory) {
-    this.domainFactory = domainFactory;
+  public BankAccountFacade(final DomainFactory domainFactoryParam) {
+    this.domainFactory = domainFactoryParam;
   }
 
   /**
@@ -40,7 +40,7 @@ public class BankAccountFacade {
    * @param initialBalance the initial balance of the new account
    * @return the newly created bank account
    */
-  public BankAccount createAccount(String name, BigDecimal initialBalance) {
+  public BankAccount createAccount(final String name, final BigDecimal initialBalance) {
     BankAccount account = domainFactory.createBankAccount(name, initialBalance);
     accounts.put(account.getId(), account);
     return account;
@@ -52,7 +52,7 @@ public class BankAccountFacade {
    * @param id the ID of the bank account to retrieve
    * @return the bank account with the specified ID, or null if it does not exist
    */
-  public BankAccount getAccount(UUID id) {
+  public BankAccount getAccount(final UUID id) {
     return accounts.get(id);
   }
 
@@ -70,7 +70,7 @@ public class BankAccountFacade {
    *
    * @param id the ID of the bank account to delete
    */
-  public void deleteAccount(UUID id) {
+  public void deleteAccount(final UUID id) {
     accounts.remove(id);
   }
 
@@ -82,7 +82,7 @@ public class BankAccountFacade {
    * @throws IllegalArgumentException if the account is not found
    * @throws IllegalStateException if the operation would result in a negative balance
    */
-  public void updateBalance(UUID accountId, Operation operation) {
+  public void updateBalance(final UUID accountId, final Operation operation) {
     BankAccount account = accounts.get(accountId);
     if (account == null) {
       throw new IllegalArgumentException("Счет не найден");
