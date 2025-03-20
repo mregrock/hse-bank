@@ -1,4 +1,4 @@
-package ru.hse.bank.command;
+package ru.hse.bank.command.account;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,18 +6,23 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import ru.hse.bank.model.BankAccount;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class TimedCommandTest {
+class TimedAccountCommandTest {
 
     @Mock
-    private Command<String> mockCommand;
+    private AccountCommand mockCommand;
 
-    private TimedCommand<String> timedCommand;
+    @Mock
+    private BankAccount mockBankAccount;
+
+    private TimedAccountCommand timedCommand;
     private ByteArrayOutputStream outputStream;
     private PrintStream originalOut;
 
@@ -30,7 +35,7 @@ class TimedCommandTest {
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
 
-        timedCommand = new TimedCommand<>(mockCommand);
+        timedCommand = new TimedAccountCommand(mockCommand);
     }
 
     @AfterEach
@@ -40,26 +45,20 @@ class TimedCommandTest {
 
     @Test
     void executeShouldDelegateToWrappedCommand() {
+        when(mockCommand.execute()).thenReturn(mockBankAccount);
 
-        String expected = "test result";
-        when(mockCommand.execute()).thenReturn(expected);
+        BankAccount result = timedCommand.execute();
 
-
-        String result = timedCommand.execute();
-
-
-        assertEquals(expected, result);
+        assertNotNull(result);
+        assertSame(mockBankAccount, result);
         verify(mockCommand, times(1)).execute();
     }
 
     @Test
     void executeShouldMeasureTime() {
-
-        when(mockCommand.execute()).thenReturn("test");
-
+        when(mockCommand.execute()).thenReturn(mockBankAccount);
 
         timedCommand.execute();
-
 
         String output = outputStream.toString();
         assertTrue(output.contains("Выполнение команды заняло:"));
@@ -68,16 +67,13 @@ class TimedCommandTest {
 
     @Test
     void executeShouldWorkWithSlowOperation() throws InterruptedException {
-
         when(mockCommand.execute()).thenAnswer(invocation -> {
 
             Thread.sleep(100);
-            return "slow operation result";
+            return mockBankAccount;
         });
 
-
         timedCommand.execute();
-
 
         String output = outputStream.toString();
         assertTrue(output.contains("Выполнение команды заняло:"));

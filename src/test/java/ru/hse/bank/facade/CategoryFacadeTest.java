@@ -30,7 +30,7 @@ class CategoryFacadeTest {
 
     @Test
     void createCategory_ShouldCreateAndStoreCategory() {
-        // Arrange
+
         String name = "Еда";
         CategoryType type = CategoryType.EXPENSE;
         UUID categoryId = UUID.randomUUID();
@@ -43,28 +43,28 @@ class CategoryFacadeTest {
 
         when(domainFactory.createCategory(name, type)).thenReturn(mockCategory);
 
-        // Act
+
         Category result = categoryFacade.createCategory(name, type);
 
-        // Assert
+
         assertEquals(mockCategory, result);
         verify(domainFactory).createCategory(name, type);
 
-        
+
         assertEquals(mockCategory, categoryFacade.getCategory(categoryId));
     }
 
     @Test
     void getAllCategories_ShouldReturnAllCategories() {
-        // Arrange
+
         Category category1 = createAndAddCategory("Зарплата", CategoryType.INCOME);
         Category category2 = createAndAddCategory("Транспорт", CategoryType.EXPENSE);
         Category category3 = createAndAddCategory("Кафе", CategoryType.EXPENSE);
 
-        // Act
+
         List<Category> allCategories = categoryFacade.getAllCategories();
 
-        // Assert
+
         assertEquals(3, allCategories.size());
         assertTrue(allCategories.contains(category1));
         assertTrue(allCategories.contains(category2));
@@ -73,16 +73,16 @@ class CategoryFacadeTest {
 
     @Test
     void getCategoriesByType_ShouldReturnCategoriesOfSpecificType() {
-        // Arrange
+
         Category incomeCategory1 = createAndAddCategory("Зарплата", CategoryType.INCOME);
         Category incomeCategory2 = createAndAddCategory("Проценты", CategoryType.INCOME);
         Category expenseCategory = createAndAddCategory("Транспорт", CategoryType.EXPENSE);
 
-        // Act
+
         List<Category> incomeCategories = categoryFacade.getCategoriesByType(CategoryType.INCOME);
         List<Category> expenseCategories = categoryFacade.getCategoriesByType(CategoryType.EXPENSE);
 
-        // Assert
+
         assertEquals(2, incomeCategories.size());
         assertTrue(incomeCategories.contains(incomeCategory1));
         assertTrue(incomeCategories.contains(incomeCategory2));
@@ -93,14 +93,14 @@ class CategoryFacadeTest {
 
     @Test
     void deleteCategory_ShouldRemoveCategoryFromFacade() {
-        // Arrange
+
         Category category = createAndAddCategory("Кафе", CategoryType.EXPENSE);
         UUID categoryId = category.getId();
 
-        // Act
+
         categoryFacade.deleteCategory(categoryId);
 
-        // Assert
+
         assertNull(categoryFacade.getCategory(categoryId));
     }
 

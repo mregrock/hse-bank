@@ -30,7 +30,7 @@ class JsonDataVisitorTest {
 
     @Test
     void visit_BankAccount_ShouldAddToAccounts() throws Exception {
-        // Arrange
+
         UUID accountId = UUID.randomUUID();
         BankAccount account = BankAccount.builder()
                 .id(accountId)
@@ -38,11 +38,11 @@ class JsonDataVisitorTest {
                 .balance(new BigDecimal("1000.00"))
                 .build();
 
-        // Act
+
         jsonDataVisitor.visit(account);
         String result = jsonDataVisitor.getResult();
 
-        // Assert
+
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("accounts"));
         assertEquals(1, jsonNode.get("accounts").size());
@@ -57,7 +57,7 @@ class JsonDataVisitorTest {
 
     @Test
     void visit_Category_ShouldAddToCategories() throws Exception {
-        // Arrange
+
         UUID categoryId = UUID.randomUUID();
         Category category = Category.builder()
                 .id(categoryId)
@@ -65,11 +65,11 @@ class JsonDataVisitorTest {
                 .type(CategoryType.INCOME)
                 .build();
 
-        // Act
+
         jsonDataVisitor.visit(category);
         String result = jsonDataVisitor.getResult();
 
-        // Assert
+
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("categories"));
         assertEquals(1, jsonNode.get("categories").size());
@@ -82,7 +82,7 @@ class JsonDataVisitorTest {
 
     @Test
     void visit_Operation_ShouldAddToOperations() throws Exception {
-        // Arrange
+
         UUID operationId = UUID.randomUUID();
         UUID accountId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
@@ -98,11 +98,11 @@ class JsonDataVisitorTest {
                 .date(now)
                 .build();
 
-        // Act
+
         jsonDataVisitor.visit(operation);
         String result = jsonDataVisitor.getResult();
 
-        // Assert
+
         JsonNode jsonNode = objectMapper.readTree(result);
         assertTrue(jsonNode.has("operations"));
         assertEquals(1, jsonNode.get("operations").size());
@@ -120,7 +120,7 @@ class JsonDataVisitorTest {
 
     @Test
     void getResult_WithMultipleEntities_ShouldReturnValidJson() throws Exception {
-        // Arrange
+
         BankAccount account = BankAccount.builder()
                 .id(UUID.randomUUID())
                 .name("Тестовый счет")
@@ -143,13 +143,13 @@ class JsonDataVisitorTest {
                 .date(LocalDateTime.now())
                 .build();
 
-        // Act
+
         jsonDataVisitor.visit(account);
         jsonDataVisitor.visit(category);
         jsonDataVisitor.visit(operation);
         String result = jsonDataVisitor.getResult();
 
-        // Assert
+
         JsonNode jsonNode = objectMapper.readTree(result);
 
         assertTrue(jsonNode.has("accounts"));

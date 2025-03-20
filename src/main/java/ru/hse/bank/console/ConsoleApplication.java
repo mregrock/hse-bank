@@ -237,7 +237,7 @@ public class ConsoleApplication implements CommandLineRunner {
         return;
       }
 
-      
+
       final Category category = categoryFacade.getCategory(categoryId);
       if (category == null) {
         System.out.println("Ошибка: Категория с указанным ID не найдена.");
@@ -259,7 +259,7 @@ public class ConsoleApplication implements CommandLineRunner {
       System.out.print("Введите описание: ");
       final String description = scanner.nextLine();
 
-      
+
       final CategoryType type = category.getType();
       System.out.println("Тип операции (на основе выбранной категории): " + type);
 
@@ -319,7 +319,7 @@ public class ConsoleApplication implements CommandLineRunner {
     System.out.print("Введите путь для экспорта: ");
     final String inputPath = scanner.nextLine();
 
-    
+
     final String path;
     if (inputPath.startsWith("~")) {
       final String homePath = System.getProperty("user.home");
@@ -330,7 +330,7 @@ public class ConsoleApplication implements CommandLineRunner {
 
     try {
       final Path filePath = Path.of(path);
-      
+
       final Path parent = filePath.getParent();
       if (parent != null) {
         java.nio.file.Files.createDirectories(parent);
@@ -350,7 +350,7 @@ public class ConsoleApplication implements CommandLineRunner {
     System.out.print("Введите путь к файлу для импорта: ");
     final String inputPath = scanner.nextLine();
 
-    
+
     final String path;
     if (inputPath.startsWith("~")) {
       final String homePath = System.getProperty("user.home");

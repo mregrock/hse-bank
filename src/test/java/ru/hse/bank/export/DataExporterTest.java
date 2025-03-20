@@ -56,7 +56,7 @@ class DataExporterTest {
 
     @Test
     void exportData_ShouldExportAllEntities() throws IOException {
-        // Arrange
+
         BankAccount account1 = BankAccount.builder()
                 .id(UUID.randomUUID())
                 .name("Счет 1")
@@ -110,10 +110,10 @@ class DataExporterTest {
         when(operationFacade.getAllOperations()).thenReturn(operations);
         when(dataVisitor.getResult()).thenReturn("Экспортированные данные");
 
-        // Act
+
         dataExporter.exportData(exportFile, dataVisitor);
 
-        // Assert
+
         verify(bankAccountFacade).getAllAccounts();
         verify(categoryFacade).getAllCategories();
         verify(operationFacade).getAllOperations();

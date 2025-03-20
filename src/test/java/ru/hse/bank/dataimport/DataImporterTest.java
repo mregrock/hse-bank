@@ -53,7 +53,7 @@ class DataImporterTest {
 
     @Test
     void importData_ShouldImportAccountsCategoriesAndOperations() throws IOException {
-        // Arrange
+
         String testContent = "Тестовый контент";
         UUID accountId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
@@ -90,16 +90,13 @@ class DataImporterTest {
         List<Operation> operations = new ArrayList<>();
         operations.add(operation);
 
-        // Настраиваем моки с использованием spy
         doReturn(testContent).when(dataImporter).readFile(any(Path.class));
         doReturn(accounts).when(dataImporter).parseAccounts(testContent);
         doReturn(categories).when(dataImporter).parseCategories(testContent);
         doReturn(operations).when(dataImporter).parseOperations(testContent);
 
-        // Act
         dataImporter.importData(testFile);
 
-        
         verify(bankAccountFacade).createAccount("Тестовый счет", new BigDecimal("1000.00"));
         verify(categoryFacade).createCategory("Тестовая категория", CategoryType.INCOME);
         verify(operationFacade).createOperation(
@@ -111,7 +108,7 @@ class DataImporterTest {
         );
     }
 
-    
+
     private static class TestDataImporter extends DataImporter {
 
         public TestDataImporter(BankAccountFacade bankAccountFacade, 
